@@ -10,7 +10,10 @@ func Init() {
 
 	v1 := router.Group("/api/v1")
 	{
-		v1.POST("", handler.Login)
+		v1.POST("/login", handler.Login)
+		v1.POST("/create", handler.Create)
+		v1.DELETE("/:email", handler.Delete)
+		v1.PUT("/update-password", handler.UpdatePassword)
 	}
 
 	router.Run()
