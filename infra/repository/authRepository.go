@@ -2,49 +2,69 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
+
+	"github.com/MachadoMichael/GoAPI/schema"
 )
 
-type Credentials struct {
-	Email    string
-	Password string
-}
-
 type AuthRepository interface {
-	Login(credentials Credentials) (*Credentials, error)
-	Create(credentials Credentials) error
+	Login(credentials schema.Credentials) (*schema.Credentials, error)
+	Create(credentials schema.Credentials) error
 	Delete(email string) error
 	UpdatePassword(email string, oldPassword string, newPassword string) error
 }
 
-// Basic implementation of AuthRepository
-type basicAuthRepo struct {
+type BasicAuthRepo struct {
 	db *sql.DB
 }
 
-func (b *basicAuthRepo) Login(credentials Credentials) (*Credentials, error) {
-	// Placeholder for finding credentials in the database
-	// You would typically execute a SELECT query here
-	// For demonstration, we'll return the input credentials as if they were found
-	return &credentials, nil
+func NewBasicAuthRepo(db *sql.DB) *BasicAuthRepo {
+	return &BasicAuthRepo{db: db}
 }
 
-func (b *basicAuthRepo) Create(credentials Credentials) error {
-	// Placeholder for creating new credentials in the database
-	// Execute an INSERT query here
-	// Return an error if something goes wrong
+func (b *BasicAuthRepo) Login(credentials schema.Credentials) (*schema.Credentials, error) {
+	var foundEmail string
+	err := b.db.QueryRow("SELECT Email FROM users WHERE Email =? AND Password =?", credentials.Email, credentials.Password).Scan(&foundEmail)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("no such user")
+		}
+		return nil, err
+	}
+	return &schema.Credentials{Email: foundEmail}, nil
+}
+
+func (b *BasicAuthRepo) Create(credentials schema.Credentials) error {
+	_, err := b.db.Exec("INSERT INTO users (Email, Password) VALUES (?,?)", credentials.Email, credentials.Password)
+	return err
+}
+
+func (b *BasicAuthRepo) Delete(email string) error {
+
+	result, err := b.db.Exec("DELETE FROM users WHERE Email =?", email)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return errors.New("no user found with this email")
+	}
+
 	return nil
 }
 
-func (b *basicAuthRepo) Delete(email string) error {
-	// Placeholder for deleting credentials from the database
-	// Execute a DELETE query here
-	// Return an error if something goes wrong
-	return nil
-}
+func (b *BasicAuthRepo) UpdatePassword(email string, oldPassword string, newPassword string) error {
+	var foundEmail string
+	err := b.db.QueryRow("SELECT Email FROM users WHERE Email =? AND Password =?", email, oldPassword).Scan(&foundEmail)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("old password does not match")
+		}
+		return err
+	}
 
-func (b *basicAuthRepo) UpdatePassword(email string, newPassword string) error {
-	// Placeholder for updating the password of existing credentials
-	// Execute an UPDATE query here
-	// Return an error if something goes wrong
-	return nil
+	_, err = b.db.Exec("UPDATE users SET Password =? WHERE Email =?", newPassword, email)
+	return err
 }
