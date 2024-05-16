@@ -36,7 +36,7 @@ func Create(ctx *gin.Context) {
 	}
 
 	err := repository.AuthRepo.Create(request)
-	if err == nil {
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create credential"})
 		return
 	}
