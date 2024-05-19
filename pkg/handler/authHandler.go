@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/MachadoMichael/GoAPI/dto"
-	"github.com/MachadoMichael/GoAPI/infra/repository"
+	"github.com/MachadoMichael/GoAPI/infra/database/repository"
 	"github.com/MachadoMichael/GoAPI/schema"
 	"github.com/gin-gonic/gin"
 )
