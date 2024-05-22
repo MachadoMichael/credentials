@@ -1,43 +1,42 @@
 package repository
 
 import (
-	"database/sql"
+	"context"
+	"fmt"
 	"log"
 	"os"
+	"strconv"
 
-	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
-	_ "github.com/lib/pq"
+	"github.com/go-redis/redis/v8"
 )
 
 var AuthRepo *BasicAuthRepo
 
 func InitDB() {
-	connString := os.Getenv("DATABASE_CONNECTION_STRING")
+	ctx := context.Background()
 
-	db, err := sql.Open("postgres", connString)
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
-	}
-	defer db.Close()
+	envDbName := os.Getenv("DATABASE_NAME")
 
-	m, err := migrate.New(
-		"file://infra/db/migrations",
-		connString,
-	)
+	dbName, err := strconv.Atoi(envDbName)
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
 
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatal(err)
-	}
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     os.Getenv("DATABASE_ADDRESS"),
+		Password: os.Getenv("DATABASE_PASSWORD"),
+		DB:       dbName,
+	})
 
-	err = db.Ping()
+	defer rdb.Close()
+
+	pong, err := rdb.Ping(ctx).Result()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	AuthRepo = NewBasicAuthRepo(db)
+	fmt.Printf(pong)
+
+	AuthRepo = NewBasicAuthRepo(ctx, rdb)
 }

@@ -1,10 +1,12 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
 	"github.com/MachadoMichael/GoAPI/schema"
+	"github.com/go-redis/redis/v8"
 )
 
 type AuthRepository interface {
@@ -15,16 +17,17 @@ type AuthRepository interface {
 }
 
 type BasicAuthRepo struct {
-	db *sql.DB
+	ctx context.Context
+	db  *redis.Client
 }
 
-func NewBasicAuthRepo(db *sql.DB) *BasicAuthRepo {
-	return &BasicAuthRepo{db: db}
+func NewBasicAuthRepo(ctx context.Context, db *redis.Client) *BasicAuthRepo {
+	return &BasicAuthRepo{ctx: ctx, db: db}
 }
 
 func (b *BasicAuthRepo) Login(credentials schema.Credentials) (*schema.Credentials, error) {
 	var foundEmail string
-	err := b.db.QueryRow("SELECT Email FROM users WHERE Email =? AND Password =?", credentials.Email, credentials.Password).Scan(&foundEmail)
+	result, err := b.db.Set(b.ctx, credentials.Email, credentials.Password).Result()
 
 	if err != nil {
 		if err == sql.ErrNoRows {

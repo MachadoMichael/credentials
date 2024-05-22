@@ -1,8 +1,18 @@
-build:
-	go build -o bin/GoAPI ./cmd
-	
-run: build
-	@./bin/GoAPI
+build:# Define the name of the binary
+BINARY_NAME=./bin/goapi
 
-test:
-	@go test -v  ./cmd/...
+# Default target
+all: build
+
+# Build the binary
+build:
+	go build -o $(BINARY_NAME) ./cmd/main.go
+
+# Run the binary
+run: build
+	$(BINARY_NAME)
+
+# Clean up the binary
+clean:
+	rm -f $(BINARY_NAME)
+
