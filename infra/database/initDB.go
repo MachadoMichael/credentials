@@ -1,4 +1,4 @@
-package repository
+package database
 
 import (
 	"context"
@@ -10,9 +10,9 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-var AuthRepo *BasicAuthRepo
+var CredentialRepo *Repo
 
-func InitDB() {
+func Init() {
 	ctx := context.Background()
 
 	envDbName := os.Getenv("DATABASE_NAME")
@@ -20,7 +20,7 @@ func InitDB() {
 	dbName, err := strconv.Atoi(envDbName)
 	if err != nil {
 		log.Fatal(err)
-		return
+		panic("Cannot read envDbName")
 	}
 
 	rdb := redis.NewClient(&redis.Options{
@@ -37,6 +37,6 @@ func InitDB() {
 	}
 
 	fmt.Printf(pong)
+	CredentialRepo = NewRepo(ctx, rdb)
 
-	AuthRepo = NewBasicAuthRepo(ctx, rdb)
 }
