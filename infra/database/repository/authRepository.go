@@ -2,18 +2,15 @@ package repository
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 
 	"github.com/MachadoMichael/GoAPI/schema"
 	"github.com/go-redis/redis/v8"
 )
 
 type AuthRepository interface {
-	Login(credentials schema.Credentials) (*schema.Credentials, error)
 	Create(credentials schema.Credentials) error
-	Delete(email string) error
-	UpdatePassword(email string, oldPassword string, newPassword string) error
+	Read(ctx context.Context, key string) (string, error)
+	Delete(email string) (int64, error)
 }
 
 type BasicAuthRepo struct {
@@ -25,49 +22,20 @@ func NewBasicAuthRepo(ctx context.Context, db *redis.Client) *BasicAuthRepo {
 	return &BasicAuthRepo{ctx: ctx, db: db}
 }
 
-func (b *BasicAuthRepo) Login(credentials schema.Credentials) (*schema.Credentials, error) {
-	var foundEmail string
-	result, err := b.db.Set(b.ctx, credentials.Email, credentials.Password).Result()
-
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, errors.New("no such user")
-		}
-		return nil, err
-	}
-	return &schema.Credentials{Email: foundEmail}, nil
-}
-
 func (b *BasicAuthRepo) Create(credentials schema.Credentials) error {
-	_, err := b.db.Exec("INSERT INTO users (Email, Password) VALUES (?,?)", credentials.Email, credentials.Password)
-	return err
+	return b.db.Set(b.ctx, credentials.Email, credentials.Password, 0).Err()
 }
 
-func (b *BasicAuthRepo) Delete(email string) error {
-
-	result, err := b.db.Exec("DELETE FROM users WHERE Email =?", email)
-	if err != nil {
-		return err
+func (b *BasicAuthRepo) Read(ctx context.Context, key string) (string, error) {
+	result, err := b.db.Get(ctx, key).Result()
+	if err == redis.Nil {
+		return "", nil // Key does not exist
+	} else if err != nil {
+		return "", err
 	}
-
-	rowsAffected, _ := result.RowsAffected()
-	if rowsAffected == 0 {
-		return errors.New("no user found with this email")
-	}
-
-	return nil
+	return result, nil
 }
 
-func (b *BasicAuthRepo) UpdatePassword(email string, oldPassword string, newPassword string) error {
-	var foundEmail string
-	err := b.db.QueryRow("SELECT Email FROM users WHERE Email =? AND Password =?", email, oldPassword).Scan(&foundEmail)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return errors.New("old password does not match")
-		}
-		return err
-	}
-
-	_, err = b.db.Exec("UPDATE users SET Password =? WHERE Email =?", newPassword, email)
-	return err
+func (b *BasicAuthRepo) Delete(email string) (int64, error) {
+	return b.db.Del(b.ctx, email).Result()
 }
