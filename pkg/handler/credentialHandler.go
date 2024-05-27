@@ -3,16 +3,17 @@ package handler
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/MachadoMichael/GoAPI/dto"
 	"github.com/MachadoMichael/GoAPI/infra/database"
+	"github.com/MachadoMichael/GoAPI/pkg/encrypt"
 	"github.com/MachadoMichael/GoAPI/schema"
 	"github.com/gin-gonic/gin"
 )
 
 func Login(ctx *gin.Context) {
 	request := schema.Credentials{}
-
 	if err := ctx.BindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -89,5 +90,31 @@ func UpdatePassword(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create credential"})
 	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "Password update successful"})
+
+}
+
+func TokenValidation(ctx *gin.Context) {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "secret key not set"})
+		ctx.Abort()
+		return
+	}
+
+	token := ctx.GetHeader("Authorization")
+	if token == "" {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "no token provided"})
+		ctx.Abort()
+		return
+	}
+
+	// Validate the token
+	_, err := encrypt.ValidateToken(token, secret)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		ctx.Abort()
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "token authorized successfully."})
 
 }
