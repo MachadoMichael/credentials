@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"unicode/utf8"
 
 	"github.com/MachadoMichael/GoAPI/infra/database"
 	"github.com/MachadoMichael/GoAPI/schema"
@@ -12,6 +13,22 @@ func Create(ctx *gin.Context) {
 	request := schema.Credentials{}
 	if err := ctx.BindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	cred, errRead := database.CredentialRepo.Read(request.Email)
+	if errRead != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": errRead.Error})
+		return
+	}
+
+	if cred != "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "This email already on use"})
+		return
+	}
+
+	if utf8.RuneCountInString(request.Password) < 6 {
+		ctx.JSON(http.StatusBadGateway, gin.H{"error": "Password need to have more than 6 characters."})
 		return
 	}
 
