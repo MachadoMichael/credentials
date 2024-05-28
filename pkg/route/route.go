@@ -12,7 +12,6 @@ func Init() {
 	{
 		v1.POST("/login", handler.Login)
 		v1.POST("/create", handler.Create)
-		v1.POST("/token", handler.TokenValidation)
 		v1.DELETE("/:email", handler.Delete)
 		v1.PUT("/update-password", handler.UpdatePassword)
 	}

@@ -5,6 +5,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/MachadoMichael/GoAPI/infra/database"
+	"github.com/MachadoMichael/GoAPI/pkg/encrypt"
 	"github.com/MachadoMichael/GoAPI/schema"
 	"github.com/gin-gonic/gin"
 )
@@ -32,9 +33,16 @@ func Create(ctx *gin.Context) {
 		return
 	}
 
+	hash, hashErr := encrypt.HashPassword(request.Password)
+	if hashErr != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": hashErr.Error})
+		return
+	}
+
+	request.Password = hash
+
 	err := database.CredentialRepo.Create(request)
 	if err != nil {
-
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error})
 		return
 	}

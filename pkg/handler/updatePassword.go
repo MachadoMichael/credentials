@@ -6,11 +6,17 @@ import (
 
 	"github.com/MachadoMichael/GoAPI/dto"
 	"github.com/MachadoMichael/GoAPI/infra/database"
+	"github.com/MachadoMichael/GoAPI/pkg/encrypt"
 	"github.com/MachadoMichael/GoAPI/schema"
 	"github.com/gin-gonic/gin"
 )
 
 func UpdatePassword(ctx *gin.Context) {
+
+	if !isValidToken(ctx) {
+		return
+	}
+
 	request := dto.UpdatePasswordRequest{}
 	credBackup := schema.Credentials{}
 
@@ -20,7 +26,13 @@ func UpdatePassword(ctx *gin.Context) {
 	}
 
 	credentialPassword, err := database.CredentialRepo.Read(request.Email)
-	if err != nil || credentialPassword != request.OldPassword {
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = encrypt.VerifyPassword(request.OldPassword, credentialPassword)
+	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}

@@ -2,12 +2,22 @@ package encrypt
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 )
 
-func GenerateToken(tt1 time.Duration, payload interface{}, secretJWTKey string) (string, error) {
+func GenerateToken(payload interface{}) (string, error) {
+
+	tt1 := time.Hour * 24
+	secretJWTKey := os.Getenv("JWT_SECRET")
+	if secretJWTKey == "" {
+		log.Fatal("Error on read secret.")
+		return "", fmt.Errorf("Cannot read secret on enviroment variables.")
+	}
+
 	token := jwt.New(jwt.SigningMethodES256)
 
 	now := time.Now().UTC()

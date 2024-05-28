@@ -10,6 +10,10 @@ import (
 func Delete(ctx *gin.Context) {
 	email := ctx.Param("email")
 
+	if !isValidToken(ctx) {
+		return
+	}
+
 	cred, errRead := database.CredentialRepo.Read(email)
 	if errRead != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": errRead.Error})
