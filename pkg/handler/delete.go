@@ -10,6 +10,17 @@ import (
 func Delete(ctx *gin.Context) {
 	email := ctx.Param("email")
 
+	cred, errRead := database.CredentialRepo.Read(email)
+	if errRead != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": errRead.Error})
+		return
+	}
+
+	if cred == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "There isn't register for this email."})
+		return
+	}
+
 	rows, err := database.CredentialRepo.Delete(email)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error})
