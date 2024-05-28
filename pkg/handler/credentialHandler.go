@@ -37,7 +37,8 @@ func Create(ctx *gin.Context) {
 
 	err := database.CredentialRepo.Create(request)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create credential"})
+
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error})
 		return
 	}
 
@@ -49,7 +50,7 @@ func Delete(ctx *gin.Context) {
 
 	rows, err := database.CredentialRepo.Delete(email)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete credential"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error})
 		return
 	}
 
@@ -77,17 +78,18 @@ func UpdatePassword(ctx *gin.Context) {
 
 	rows, err := database.CredentialRepo.Delete(request.Email)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update credential", "rows_affcteds": rows})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error, "rows_affcteds": rows})
 	}
 
 	err = database.CredentialRepo.Create(schema.Credentials{Email: request.Email, Password: request.NewPassword})
 	if err != nil {
 		backErr := database.CredentialRepo.Create(cred)
 		if backErr != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create backup data credential"})
+
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": backErr.Error})
 			log.Fatal("cannot save backup %i", cred)
 		}
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create credential"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error})
 	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "Password update successful"})
 
@@ -108,7 +110,6 @@ func TokenValidation(ctx *gin.Context) {
 		return
 	}
 
-	// Validate the token
 	_, err := encrypt.ValidateToken(token, secret)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})

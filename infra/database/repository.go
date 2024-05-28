@@ -23,7 +23,7 @@ func NewRepo(ctx context.Context, db *redis.Client) *Repo {
 }
 
 func (r *Repo) Create(credentials schema.Credentials) error {
-	return r.db.Set(r.ctx, credentials.Email, credentials.Password, 0).Err()
+	return r.db.Set(r.ctx, credentials.Email, credentials.Password, 1000000000).Err()
 }
 
 func (r *Repo) Read(key string) (string, error) {

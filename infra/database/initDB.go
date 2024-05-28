@@ -12,6 +12,7 @@ import (
 )
 
 var CredentialRepo *Repo
+var client *redis.Client
 
 func Init() {
 	ctx := context.Background()
@@ -38,14 +39,17 @@ func Init() {
 		DB:       dbName,
 	})
 
-	defer rdb.Close()
-
 	pong, err := rdb.Ping(ctx).Result()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Printf(pong)
+	client = rdb
 	CredentialRepo = NewRepo(ctx, rdb)
 
+}
+
+func CloseDb() {
+	client.Close()
 }

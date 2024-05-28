@@ -7,5 +7,6 @@ import (
 
 func main() {
 	database.Init()
+	defer database.CloseDb()
 	route.Init()
 }
