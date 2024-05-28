@@ -12,8 +12,7 @@ import (
 
 func UpdatePassword(ctx *gin.Context) {
 	request := dto.UpdatePasswordRequest{}
-
-	cred := schema.Credentials{}
+	credBackup := schema.Credentials{}
 
 	if err := ctx.BindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -26,8 +25,8 @@ func UpdatePassword(ctx *gin.Context) {
 		return
 	}
 
-	cred.Email = request.Email
-	cred.Password = request.OldPassword
+	credBackup.Email = request.Email
+	credBackup.Password = request.OldPassword
 
 	rows, err := database.CredentialRepo.Delete(request.Email)
 	if err != nil {
@@ -36,11 +35,11 @@ func UpdatePassword(ctx *gin.Context) {
 
 	err = database.CredentialRepo.Create(schema.Credentials{Email: request.Email, Password: request.NewPassword})
 	if err != nil {
-		backErr := database.CredentialRepo.Create(cred)
+		backErr := database.CredentialRepo.Create(credBackup)
 		if backErr != nil {
 
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": backErr.Error})
-			log.Fatal("cannot save backup %i", cred)
+			log.Fatal("cannot save backup %i", credBackup)
 		}
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error})
 	}
