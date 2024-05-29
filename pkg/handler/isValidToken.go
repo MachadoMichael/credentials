@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/MachadoMichael/GoAPI/pkg/encrypt"
+	"github.com/MachadoMichael/credentials/pkg/encrypt"
 	"github.com/gin-gonic/gin"
 )
 

@@ -3,7 +3,7 @@ package database
 import (
 	"context"
 
-	"github.com/MachadoMichael/GoAPI/schema"
+	"github.com/MachadoMichael/credentials/schema"
 	"github.com/go-redis/redis/v8"
 )
 

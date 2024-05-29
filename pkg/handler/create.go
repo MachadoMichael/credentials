@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"unicode/utf8"
 
-	"github.com/MachadoMichael/GoAPI/infra/database"
-	"github.com/MachadoMichael/GoAPI/pkg/encrypt"
-	"github.com/MachadoMichael/GoAPI/schema"
+	"github.com/MachadoMichael/credentials/infra/database"
+	"github.com/MachadoMichael/credentials/pkg/encrypt"
+	"github.com/MachadoMichael/credentials/schema"
 	"github.com/gin-gonic/gin"
 )
 

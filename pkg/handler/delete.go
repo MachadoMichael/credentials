@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/MachadoMichael/GoAPI/infra/database"
+	"github.com/MachadoMichael/credentials/infra/database"
 	"github.com/gin-gonic/gin"
 )
 

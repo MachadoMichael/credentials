@@ -1,7 +1,7 @@
 package route
 
 import (
-	"github.com/MachadoMichael/GoAPI/pkg/handler"
+	"github.com/MachadoMichael/credentials/pkg/handler"
 	"github.com/gin-gonic/gin"
 )
 

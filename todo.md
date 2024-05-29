@@ -1,7 +1,7 @@
 ## todo
 
-[] generate token
+[x] generate token
 [] validate token
-[] encrypt password
-[] compare password
+[x] encrypt password
+[x] compare password
 [] connection log

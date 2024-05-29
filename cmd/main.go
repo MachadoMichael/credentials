@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/MachadoMichael/GoAPI/infra/database"
-	"github.com/MachadoMichael/GoAPI/pkg/route"
+	"github.com/MachadoMichael/credentials/infra/database"
+	"github.com/MachadoMichael/credentials/pkg/route"
 )
 
 func main() {
