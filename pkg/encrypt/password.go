@@ -2,6 +2,7 @@ package encrypt
 
 import (
 	"fmt"
+
 	"golang.org/x/crypto/bcrypt"
 )
 

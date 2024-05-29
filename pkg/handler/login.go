@@ -22,7 +22,7 @@ func Login(ctx *gin.Context) {
 		return
 	}
 
-	err = encrypt.VerifyPassword(request.Password, credentialPassword)
+	err = encrypt.VerifyPassword(credentialPassword, request.Password)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return

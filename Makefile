@@ -8,6 +8,10 @@ all: build
 build:
 	go build -o $(BINARY_NAME) ./cmd/main.go
 
+# Turn on Redis
+db:
+	docker compose up -d
+
 # Run the binary
 run: build
 	$(BINARY_NAME)

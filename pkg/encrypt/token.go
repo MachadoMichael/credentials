@@ -2,36 +2,22 @@ package encrypt
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 )
 
-func GenerateToken(payload interface{}) (string, error) {
+func GenerateToken(payload string) (string, error) {
+	var mySigningKey = []byte(os.Getenv("JWT_SECRET"))
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"payload": payload,
+		"exp":     time.Now().Add(time.Hour * 24).Unix(),
+	})
 
-	tt1 := time.Hour * 24
-	secretJWTKey := os.Getenv("JWT_SECRET")
-	if secretJWTKey == "" {
-		log.Fatal("Error on read secret.")
-		return "", fmt.Errorf("Cannot read secret on enviroment variables.")
-	}
-
-	token := jwt.New(jwt.SigningMethodES256)
-
-	now := time.Now().UTC()
-	claim := token.Claims.(jwt.MapClaims)
-
-	claim["sub"] = payload
-	claim["exp"] = now.Add(tt1).Unix()
-	claim["iat"] = now.Unix()
-	claim["nbf"] = now.Unix()
-
-	tokenString, err := token.SignedString([]byte(secretJWTKey))
-
+	tokenString, err := token.SignedString(mySigningKey)
 	if err != nil {
-		return "", fmt.Errorf("generation JWT Token failed: %w", err)
+		return "", err
 	}
 
 	return tokenString, nil
