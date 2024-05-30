@@ -2,20 +2,13 @@ package handler
 
 import (
 	"net/http"
-	"os"
+	"strings"
 
 	"github.com/MachadoMichael/credentials/pkg/encrypt"
 	"github.com/gin-gonic/gin"
 )
 
 func isValidToken(ctx *gin.Context) bool {
-	secret := os.Getenv("JWT_SECRET")
-	if secret == "" {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "secret key not set"})
-		ctx.Abort()
-		return false
-	}
-
 	token := ctx.GetHeader("Authorization")
 	if token == "" {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "no token provided"})
@@ -23,7 +16,9 @@ func isValidToken(ctx *gin.Context) bool {
 		return false
 	}
 
-	_, err := encrypt.ValidateToken(token, secret)
+	strippedTokenStr := strings.TrimPrefix(token, "Bearer ")
+
+	res, err := encrypt.ValidateToken(strippedTokenStr)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		ctx.Abort()
@@ -31,6 +26,6 @@ func isValidToken(ctx *gin.Context) bool {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "token authorized successfully."})
-	return true
+	return res
 
 }

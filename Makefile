@@ -1,5 +1,5 @@
 build:# Define the name of the binary
-BINARY_NAME=./bin/goapi
+BINARY_NAME=./bin/credentials
 
 # Default target
 all: build
@@ -10,6 +10,10 @@ build:
 
 # Turn on Redis
 db:
+	@echo "Openning Docker Desktop..."
+	open -a Docker &
+	sleep 10
+	@echo "Docker Desktop opened. Running docker compose"
 	docker compose up -d
 
 # Run the binary
