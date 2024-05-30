@@ -17,6 +17,10 @@ func Login(ctx *gin.Context) {
 	}
 
 	credentialPassword, err := database.CredentialRepo.Read(request.Email)
+	if credentialPassword == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Credential not found."})
+		return
+	}
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
