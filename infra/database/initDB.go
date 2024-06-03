@@ -12,7 +12,6 @@ import (
 )
 
 var CredentialRepo *Repo
-var ConnectionsLogRepo *Repo
 var client *redis.Client
 
 func Init() {
@@ -35,22 +34,10 @@ func Init() {
 		panic("Cannot read envDbName")
 	}
 
-	dbLogName, err := strconv.Atoi(envDbName)
-	if err != nil {
-		log.Fatal(err)
-		panic("Cannot read envDbName")
-	}
-
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     os.Getenv("DATABASE_ADDRESS"),
 		Password: os.Getenv("DATABASE_PASSWORD"),
 		DB:       dbName,
-	})
-
-	rlogdb := redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("DATABASE_ADDRESS"),
-		Password: os.Getenv("DATABASE_PASSWORD"),
-		DB:       dbLogName,
 	})
 
 	pong, err := rdb.Ping(ctx).Result()
@@ -61,7 +48,6 @@ func Init() {
 	fmt.Printf(pong)
 	client = rdb
 	CredentialRepo = NewRepo(ctx, rdb)
-	ConnectionsLogRepo = NewRepo(ctx, rlogdb)
 }
 
 func CloseDb() {
