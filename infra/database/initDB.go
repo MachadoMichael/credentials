@@ -23,8 +23,7 @@ func Init() {
 	}
 
 	envDbName := os.Getenv("DATABASE_NAME")
-	envLogDbName := os.Getenv("DATABASE_LOG_NAME")
-	if envDbName == "" || envLogDbName == "" {
+	if envDbName == "" {
 		log.Fatal("Error on read database name.")
 	}
 

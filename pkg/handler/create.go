@@ -6,6 +6,7 @@ import (
 
 	"github.com/MachadoMichael/credentials/infra/database"
 	"github.com/MachadoMichael/credentials/pkg/encrypt"
+	"github.com/MachadoMichael/credentials/pkg/logger"
 	"github.com/MachadoMichael/credentials/schema"
 	"github.com/gin-gonic/gin"
 )
@@ -47,5 +48,6 @@ func Create(ctx *gin.Context) {
 		return
 	}
 
+	logger.LoginLogger.Write("create", "created new login")
 	ctx.JSON(http.StatusOK, gin.H{"message": "Credential created successfully"})
 }
