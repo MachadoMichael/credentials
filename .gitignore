@@ -1,2 +1,4 @@
 bin/*
 .env
+log/login.log
+log/error.log

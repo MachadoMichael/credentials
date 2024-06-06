@@ -1,73 +1,65 @@
 package logger
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
 	"time"
+
+	"golang.org/x/exp/slog"
 )
 
 // Logger represents a logger.
 type Logger struct {
-	filename string
-	file     *os.File
+	slogger *slog.Logger
+	file    *os.File
 }
 
 var LoginLogger *Logger
 var ErrorLogger *Logger
 
-func NewLogger(file *os.File) (*Logger, error) {
-	// file, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	return &Logger{filename: file.Name(), file: file}, nil
+func NewLogger(file *os.File, level slog.Level) (*Logger, error) {
+	handler := slog.NewJSONHandler(file, &slog.HandlerOptions{Level: level})
+	slogger := slog.New(handler)
+	return &Logger{slogger: slogger, file: file}, nil
 }
 
-// Write writes a log message to the logger.
-func (l *Logger) Write(level string, message string) {
-	timestamp := time.Now().Format(time.RFC3339)
-	logMessage := fmt.Sprintf("[%s] %s: %s\n", timestamp, level, message)
-	_, err := l.file.WriteString(logMessage)
-	if err != nil {
-		log.Println(err)
-	}
-
-	l.Close()
+func (l *Logger) Write(level slog.Level, message string) {
+	ctx := context.Background()
+	l.slogger.Log(ctx, level, message, slog.Time("timespam", time.Now()))
 }
 
-// Close closes the logger.
 func (l *Logger) Close() error {
 	return l.file.Close()
 }
 
-// InitLoggers initializes the loggers.
-func InitLoggers() error {
+func InitLoggers() {
 
 	loginFile, err := startingFile("login.log")
 	if err != nil {
-		return err
+		log.Fatalf("Error on start login.log, error: %v", err)
 	}
 
 	errorFile, err := startingFile("error.log")
 	if err != nil {
-		return err
+		log.Fatalf("Error on start error.log, error: %v", err)
 	}
 
-	loginLogger, err := NewLogger(loginFile)
+	loginLogger, err := NewLogger(loginFile, slog.LevelInfo)
 	if err != nil {
-		return err
+		log.Fatalf("Error on start loginLogger, error: %v", err)
 	}
 
-	errorLogger, err := NewLogger(errorFile)
+	errorLogger, err := NewLogger(errorFile, slog.LevelError)
 	if err != nil {
-		return err
+
+		log.Fatalf("Error on start errorLogger, error: %v", err)
 	}
 
 	LoginLogger = loginLogger
 	ErrorLogger = errorLogger
 
-	return nil
 }
 
 func startingFile(fileName string) (*os.File, error) {
@@ -91,7 +83,9 @@ func startingFile(fileName string) (*os.File, error) {
 		return file, nil
 	}
 
-	file, err := os.OpenFile(filePath, os.O_RDWR, 0644)
+	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
+	// os.O_RDWR, 0644)
 	if err != nil {
 		return nil, err
 	}

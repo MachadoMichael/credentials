@@ -9,6 +9,7 @@ import (
 	"github.com/MachadoMichael/credentials/pkg/logger"
 	"github.com/MachadoMichael/credentials/schema"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/exp/slog"
 )
 
 func Create(ctx *gin.Context) {
@@ -48,6 +49,6 @@ func Create(ctx *gin.Context) {
 		return
 	}
 
-	logger.LoginLogger.Write("create", "created new login")
+	logger.LoginLogger.Write(slog.LevelInfo, "created new login, for user: "+request.Email)
 	ctx.JSON(http.StatusOK, gin.H{"message": "Credential created successfully"})
 }
