@@ -16,39 +16,44 @@ func Create(ctx *gin.Context) {
 	request := schema.Credentials{}
 	if err := ctx.BindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		logger.ErrorLogger.Write(slog.LevelError, err.Error())
 		return
 	}
 
-	cred, errRead := database.CredentialRepo.Read(request.Email)
-	if errRead != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": errRead.Error})
+	cred, err := database.CredentialRepo.Read(request.Email)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error})
+		logger.ErrorLogger.Write(slog.LevelError, err.Error())
 		return
 	}
 
 	if cred != "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "This email already on use"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "This email is already in use"})
+		logger.ErrorLogger.Write(slog.LevelError, "This email is already iin use")
 		return
 	}
 
 	if utf8.RuneCountInString(request.Password) < 6 {
-		ctx.JSON(http.StatusBadGateway, gin.H{"error": "Password need to have more than 6 characters."})
+		ctx.JSON(http.StatusBadGateway, gin.H{"error": "The password must be longer than 6 characters."})
+		logger.ErrorLogger.Write(slog.LevelError, "The password must be longer than 6 characters.")
 		return
 	}
 
 	hash, hashErr := encrypt.HashPassword(request.Password)
 	if hashErr != nil {
+		logger.ErrorLogger.Write(slog.LevelError, hashErr.Error())
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": hashErr.Error})
 		return
 	}
 
 	request.Password = hash
-
-	err := database.CredentialRepo.Create(request)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error})
+	errDb := database.CredentialRepo.Create(request)
+	if errDb != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": errDb.Error})
+		logger.ErrorLogger.Write(slog.LevelError, errDb.Error())
 		return
 	}
 
-	logger.LoginLogger.Write(slog.LevelInfo, "created new login, for user: "+request.Email)
+	logger.LoginLogger.Write(slog.LevelInfo, "New Credential created successfully, email: "+request.Email)
 	ctx.JSON(http.StatusOK, gin.H{"message": "Credential created successfully"})
 }

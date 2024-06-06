@@ -5,7 +5,9 @@ import (
 	"strings"
 
 	"github.com/MachadoMichael/credentials/pkg/encrypt"
+	"github.com/MachadoMichael/credentials/pkg/logger"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/exp/slog"
 )
 
 func isValidToken(ctx *gin.Context) bool {
@@ -13,6 +15,7 @@ func isValidToken(ctx *gin.Context) bool {
 	if token == "" {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "no token provided"})
 		ctx.Abort()
+		logger.ErrorLogger.Write(slog.LevelError, "no token provided")
 		return false
 	}
 
@@ -22,9 +25,11 @@ func isValidToken(ctx *gin.Context) bool {
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		ctx.Abort()
+		logger.ErrorLogger.Write(slog.LevelError, err.Error())
 		return false
 	}
 
+	logger.LoginLogger.Write(slog.LevelInfo, "Token validate successfully, token "+token)
 	ctx.JSON(http.StatusOK, gin.H{"message": "token authorized successfully."})
 	return res
 
