@@ -37,6 +37,6 @@ func Delete(ctx *gin.Context) {
 		return
 	}
 
-	logger.LoginLogger.Write(slog.LevelInfo, "Credential deleted successfully, email: "+email)
+	logger.AccessLogger.Write(slog.LevelInfo, "Credential deleted successfully, email: "+email)
 	ctx.JSON(http.StatusOK, gin.H{"message": "Credential deleted successfully", "rows_affcteds": rows})
 }

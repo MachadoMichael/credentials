@@ -16,7 +16,7 @@ type Logger struct {
 	file    *os.File
 }
 
-var LoginLogger *Logger
+var AccessLogger *Logger
 var ErrorLogger *Logger
 
 func NewLogger(file *os.File, level slog.Level) (*Logger, error) {
@@ -36,9 +36,9 @@ func (l *Logger) Close() error {
 
 func InitLoggers() {
 
-	loginFile, err := startingFile("login.log")
+	accessFile, err := startingFile("access.log")
 	if err != nil {
-		log.Fatalf("Error on start login.log, error: %v", err)
+		log.Fatalf("Error on start access.log, error: %v", err)
 	}
 
 	errorFile, err := startingFile("error.log")
@@ -46,9 +46,9 @@ func InitLoggers() {
 		log.Fatalf("Error on start error.log, error: %v", err)
 	}
 
-	loginLogger, err := NewLogger(loginFile, slog.LevelInfo)
+	accessLogger, err := NewLogger(accessFile, slog.LevelInfo)
 	if err != nil {
-		log.Fatalf("Error on start loginLogger, error: %v", err)
+		log.Fatalf("Error on start accessLogger, error: %v", err)
 	}
 
 	errorLogger, err := NewLogger(errorFile, slog.LevelError)
@@ -57,7 +57,7 @@ func InitLoggers() {
 		log.Fatalf("Error on start errorLogger, error: %v", err)
 	}
 
-	LoginLogger = loginLogger
+	AccessLogger = accessLogger
 	ErrorLogger = errorLogger
 
 }

@@ -54,6 +54,6 @@ func Create(ctx *gin.Context) {
 		return
 	}
 
-	logger.LoginLogger.Write(slog.LevelInfo, "New Credential created successfully, email: "+request.Email)
+	logger.AccessLogger.Write(slog.LevelInfo, "New Credential created successfully, email: "+request.Email)
 	ctx.JSON(http.StatusOK, gin.H{"message": "Credential created successfully"})
 }

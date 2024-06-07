@@ -29,7 +29,7 @@ func isValidToken(ctx *gin.Context) bool {
 		return false
 	}
 
-	logger.LoginLogger.Write(slog.LevelInfo, "Token validate successfully, token "+token)
+	logger.AccessLogger.Write(slog.LevelInfo, "Token validate successfully, token "+token)
 	ctx.JSON(http.StatusOK, gin.H{"message": "token authorized successfully."})
 	return res
 

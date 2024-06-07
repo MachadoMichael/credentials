@@ -61,7 +61,7 @@ func UpdatePassword(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error})
 	}
 
-	logger.LoginLogger.Write(slog.LevelInfo, "Successful password update, email: "+request.Email)
+	logger.AccessLogger.Write(slog.LevelInfo, "Successful password update, email: "+request.Email)
 	ctx.JSON(http.StatusOK, gin.H{"message": "Password update successfully"})
 
 }
