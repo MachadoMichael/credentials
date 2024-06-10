@@ -20,7 +20,7 @@ func Create(ctx *gin.Context) {
 		return
 	}
 
-	cred, err := database.CredentialRepo.Read(request.Email)
+	cred, err := database.CredentialRepo.ReadOne(request.Email)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error})
 		logger.ErrorLogger.Write(slog.LevelError, err.Error())

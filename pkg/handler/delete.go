@@ -16,7 +16,7 @@ func Delete(ctx *gin.Context) {
 		return
 	}
 
-	cred, errRead := database.CredentialRepo.Read(email)
+	cred, errRead := database.CredentialRepo.ReadOne(email)
 	if errRead != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": errRead.Error})
 		logger.ErrorLogger.Write(slog.LevelError, errRead.Error())

@@ -19,7 +19,7 @@ func Login(ctx *gin.Context) {
 		return
 	}
 
-	credentialPassword, err := database.CredentialRepo.Read(request.Email)
+	credentialPassword, err := database.CredentialRepo.ReadOne(request.Email)
 	if credentialPassword == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Credential not found."})
 		logger.ErrorLogger.Write(slog.LevelError, "Credential not found")
@@ -37,6 +37,7 @@ func Login(ctx *gin.Context) {
 		logger.ErrorLogger.Write(slog.LevelError, err.Error())
 		return
 	}
+
 	token, err := encrypt.GenerateToken(request.Email)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

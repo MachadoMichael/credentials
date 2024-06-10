@@ -27,7 +27,7 @@ func UpdatePassword(ctx *gin.Context) {
 		return
 	}
 
-	credentialPassword, err := database.CredentialRepo.Read(request.Email)
+	credentialPassword, err := database.CredentialRepo.ReadOne(request.Email)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		logger.ErrorLogger.Write(slog.LevelError, err.Error())
