@@ -8,7 +8,7 @@ import (
 
 func main() {
 	logger.InitLoggers()
-	defer logger.LoginLogger.Close()
+	defer logger.AccessLogger.Close()
 	defer logger.ErrorLogger.Close()
 
 	database.Init()

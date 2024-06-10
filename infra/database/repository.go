@@ -7,12 +7,6 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-type Repository interface {
-	Create(credentials schema.Credentials) error
-	ReadOne(ctx context.Context, key string) (string, error)
-	Delete(email string) (int64, error)
-}
-
 type Repo struct {
 	ctx context.Context
 	db  *redis.Client
