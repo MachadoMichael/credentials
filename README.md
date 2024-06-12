@@ -56,7 +56,7 @@ Rotas utilizadas pela aplicação web para executar metodos de **POST** e **GET*
 
 | Nome | Funcionalidade|
 |------|--------------|
-|```GET``` /api/v1/getAll|Retorna todas as credencials cadastradas.|
+|```GET``` /api/v1/read|Retorna todas as credencials cadastradas.|
 |```POST``` /api/v1/login|Verifica a autenticidade da credencial e caso esteja de acordo retorna token de acesso.|
 |```POST``` /api/v1/create|Insere uma nova credencial.|
 |```DELETE``` /api/v1/:email|Deleta uma credencial pelo email.|
