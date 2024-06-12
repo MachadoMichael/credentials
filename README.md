@@ -48,7 +48,6 @@ Respeitando a proposta, o sistema deverá atender os seguintes requisitos:
 * **RF2** - Cryptografia de dados sensíves.
 * **RF3** - Logs de acesso e error.
 
-[Verifique mais detalhes aqui](https://codificar.com.br/requisitos-funcionais-nao-funcionais/).
 
 ### Mensagens internas
 
