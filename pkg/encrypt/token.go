@@ -2,13 +2,13 @@ package encrypt
 
 import (
 	"fmt"
-	"os"
 	"time"
 
+	"github.com/MachadoMichael/credentials/infra"
 	"github.com/golang-jwt/jwt"
 )
 
-var mySigningKey = []byte(os.Getenv("JWT_SECRET"))
+var mySigningKey = []byte(infra.Config.JwtSecret)
 
 func GenerateToken(payload string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{

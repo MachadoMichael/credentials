@@ -5,17 +5,11 @@ import (
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
+	"github.com/MachadoMichael/credentials/infra"
 )
 
 func loadingFile(fileName string) (*os.File, error) {
-
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalln("erro")
-	}
-
-	dir := os.Getenv("LOG_FILE_PATH")
+	dir := infra.Config.LogFilePath
 
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		err := os.Mkdir(dir, os.ModePerm)

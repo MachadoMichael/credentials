@@ -7,8 +7,7 @@
 Para executar o projeto, utilize as ferramentas descritas na sessão *Ferramentas*.
 
 ## Ferramentas
-* [Neovim](https://neovim.io/) / [Vscode](https://code.visualstudio.com/) - Editor de texto para desenvolvimento.
-* [Docker](https://www.docker.com/) - Ferramenta para criar conteiners e facilitar o build da aplicação.
+* [Neovim](https://neovim.io/) / [Vscode](https://code.visualstudio.com/) - Editor de texto para desenvolvimento. [Docker](https://www.docker.com/) - Ferramenta para criar conteiners e facilitar o build da aplicação.
 * [Make](https://embarcados.com.br/introducao-ao-makefile/) -  Ferramenta para scriptar comandos
 
 ## Links importantes
