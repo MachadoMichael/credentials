@@ -1,20 +1,20 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 	"strings"
 
 	"github.com/MachadoMichael/credentials/pkg/encrypt"
 	"github.com/MachadoMichael/credentials/pkg/logger"
-	"github.com/gin-gonic/gin"
 	"golang.org/x/exp/slog"
 )
 
-func isValidToken(ctx *gin.Context) bool {
-	token := ctx.GetHeader("Authorization")
+func isValidToken(w http.ResponseWriter, r *http.Request) bool {
+	token := r.Header.Get("Authorization")
 	if token == "" {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "no token provided"})
-		ctx.Abort()
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("no token provided")
 		logger.ErrorLogger.Write(slog.LevelError, "no token provided")
 		return false
 	}
@@ -23,14 +23,15 @@ func isValidToken(ctx *gin.Context) bool {
 
 	res, err := encrypt.ValidateToken(strippedTokenStr)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-		ctx.Abort()
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("no token provided")
 		logger.ErrorLogger.Write(slog.LevelError, err.Error())
 		return false
 	}
 
 	logger.AccessLogger.Write(slog.LevelInfo, "Token validate successfully, token "+token)
-	ctx.JSON(http.StatusOK, gin.H{"message": "token authorized successfully."})
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("token authorized successfully")
 	return res
 
 }

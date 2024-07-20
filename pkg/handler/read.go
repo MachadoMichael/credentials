@@ -1,18 +1,18 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 	"time"
 
 	"github.com/MachadoMichael/credentials/dto"
 	"github.com/MachadoMichael/credentials/infra/database"
 	"github.com/MachadoMichael/credentials/pkg/logger"
-	"github.com/gin-gonic/gin"
 	"golang.org/x/exp/slog"
 )
 
-func Read(ctx *gin.Context) {
-	if !isValidToken(ctx) {
+func Read(w http.ResponseWriter, r *http.Request) {
+	if !isValidToken(w, r) {
 		return
 	}
 
@@ -38,5 +38,6 @@ func Read(ctx *gin.Context) {
 	}
 
 	logger.AccessLogger.Write(slog.LevelInfo, "Successful to read credentials on database.")
-	ctx.JSON(http.StatusOK, gin.H{"message": "Successful to read credentials on database", "credentials": response})
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
 }
