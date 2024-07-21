@@ -2,15 +2,28 @@ package route
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/MachadoMichael/credentials/pkg/handler"
 )
 
 func Init() {
-	http.HandleFunc("/read", handler.Read)
-	http.HandleFunc("/login", handler.Login)
-	http.HandleFunc("/create", handler.Create)
-	http.HandleFunc("/{email}", handler.Delete)
-	http.HandleFunc("/update", handler.Update)
-	http.ListenAndServe(":8080", nil)
+
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/read", handler.Read)
+	mux.HandleFunc("/login", handler.Login)
+	mux.HandleFunc("/create", handler.Create)
+	mux.HandleFunc("/{email}", handler.Delete)
+	mux.HandleFunc("/update", handler.Update)
+
+	srv := &http.Server{
+		Addr:         ":8080",
+		Handler:      mux,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+
+	srv.ListenAndServe()
 }

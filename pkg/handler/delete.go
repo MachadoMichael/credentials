@@ -11,17 +11,16 @@ import (
 )
 
 func Delete(w http.ResponseWriter, r *http.Request) {
-	var email string
-	err := json.NewDecoder(r.Body).Decode(&email)
+	email := r.PathValue("email")
 	if !isValidToken(w, r) {
 		return
 	}
 
-	cred, errRead := database.CredentialRepo.ReadOne(email)
-	if errRead != nil {
+	cred, err := database.CredentialRepo.ReadOne(email)
+	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
-		logger.ErrorLogger.Write(slog.LevelError, errRead.Error())
+		logger.ErrorLogger.Write(slog.LevelError, err.Error())
 		return
 	}
 
