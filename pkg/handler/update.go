@@ -1,42 +1,47 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/MachadoMichael/credentials/dto"
 	"github.com/MachadoMichael/credentials/infra/database"
 	"github.com/MachadoMichael/credentials/pkg/encrypt"
 	"github.com/MachadoMichael/credentials/pkg/logger"
 	"github.com/MachadoMichael/credentials/schema"
-	"github.com/gin-gonic/gin"
 	"golang.org/x/exp/slog"
 )
 
-func UpdatePassword(ctx *gin.Context) {
+func Update(w http.ResponseWriter, r *http.Request) {
 
-	if !isValidToken(ctx) {
+	if !isValidToken(w, r) {
 		return
 	}
 
 	request := dto.UpdatePasswordRequest{}
 	credBackup := schema.Credentials{}
 
-	if err := ctx.BindJSON(&request); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
 		logger.ErrorLogger.Write(slog.LevelError, err.Error())
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
 
 	credentialPassword, err := database.CredentialRepo.ReadOne(request.Email)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(err.Error())
 		logger.ErrorLogger.Write(slog.LevelError, err.Error())
 		return
 	}
 
 	err = encrypt.VerifyPassword(request.OldPassword, credentialPassword)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(err.Error())
 		logger.ErrorLogger.Write(slog.LevelError, err.Error())
 		return
 	}
@@ -47,7 +52,9 @@ func UpdatePassword(ctx *gin.Context) {
 	rows, err := database.CredentialRepo.Delete(request.Email)
 	if err != nil {
 		logger.ErrorLogger.Write(slog.LevelError, err.Error())
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error, "rows_affcteds": rows})
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(err.Error() + "rows affcteds: " + strconv.FormatInt(rows, 10))
+		return
 	}
 
 	err = database.CredentialRepo.Create(schema.Credentials{Email: request.Email, Password: request.NewPassword})
@@ -55,13 +62,19 @@ func UpdatePassword(ctx *gin.Context) {
 		backErr := database.CredentialRepo.Create(credBackup)
 		if backErr != nil {
 			logger.ErrorLogger.Write(slog.LevelError, backErr.Error())
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": backErr.Error})
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(err.Error())
+			return
 		}
+
 		logger.ErrorLogger.Write(slog.LevelError, err.Error())
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error})
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(err.Error())
+		return
 	}
 
 	logger.AccessLogger.Write(slog.LevelInfo, "Successful password update, email: "+request.Email)
-	ctx.JSON(http.StatusOK, gin.H{"message": "Password update successfully"})
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("Password update successfully")
 
 }
