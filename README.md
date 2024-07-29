@@ -1,4 +1,4 @@
-# < Credentials >
+# < Credentials (service) >
 <fig>
 <img src="https://nordicapis.com/wp-content/uploads/10-Login-APIs.png" alt="tela de login">
 </fig>
