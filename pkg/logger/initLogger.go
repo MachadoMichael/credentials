@@ -6,10 +6,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-var AccessLogger *Logger
-var ErrorLogger *Logger
-
-func InitLoggers() {
+func Init() (*Logger, *Logger, error) {
 
 	accessFile, err := loadingFile("access.log")
 	if err != nil {
@@ -32,7 +29,5 @@ func InitLoggers() {
 		log.Fatalf("Error on start errorLogger, error: %v", err)
 	}
 
-	AccessLogger = accessLogger
-	ErrorLogger = errorLogger
-
+	return accessLogger, errorLogger, nil
 }
