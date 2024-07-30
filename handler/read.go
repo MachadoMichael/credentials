@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"time"
 
@@ -9,15 +10,15 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func (s *Service) Read(w http.ResponseWriter, r *http.Request) {
+func (s *Service) Read(w http.ResponseWriter, r *http.Request) error {
 	if !s.IsValidToken(w, r) {
-		return
+		return errors.New("invalid token.")
 	}
 
 	credentials, err := s.Repo.Read()
 	if err != nil {
 		s.ErrorLogger.Write(slog.LevelError, err.Error())
-		return
+		return err
 	}
 
 	var content []string
@@ -38,4 +39,5 @@ func (s *Service) Read(w http.ResponseWriter, r *http.Request) {
 	s.AccessLogger.Write(slog.LevelInfo, "Successful to read credentials on database.")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
+	return nil
 }

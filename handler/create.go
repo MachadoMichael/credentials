@@ -10,13 +10,13 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
+func (s *Service) Create(w http.ResponseWriter, r *http.Request) error {
 	credential := schema.Credentials{}
 	err := json.NewDecoder(r.Body).Decode(&credential)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
-		return
+		return err
 	}
 
 	cred, err := s.Repo.ReadOne(credential.Email)
@@ -24,21 +24,21 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
 		s.ErrorLogger.Write(slog.LevelError, err.Error())
-		return
+		return err
 	}
 
 	if cred != "" {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("This email is already in use")
 		s.ErrorLogger.Write(slog.LevelError, "This email is already iin use")
-		return
+		return err
 	}
 
 	if utf8.RuneCountInString(credential.Password) < 6 {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("The password must be longer than 6 characters.")
 		s.ErrorLogger.Write(slog.LevelError, "The password must be longer than 6 characters.")
-		return
+		return err
 	}
 
 	hash, hashErr := encrypt.HashPassword(credential.Password)
@@ -46,7 +46,7 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err)
 		s.ErrorLogger.Write(slog.LevelError, hashErr.Error())
-		return
+		return err
 	}
 
 	credential.Password = hash
@@ -55,11 +55,13 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err)
 		s.ErrorLogger.Write(slog.LevelError, errDb.Error())
-		return
+		return err
 	}
 
 	s.AccessLogger.Write(slog.LevelInfo, "New Credential created successfully, email: "+credential.Email)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("Credential created successfully")
+
+	return nil
 
 }

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -11,13 +12,13 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func (s *Service) Update(w http.ResponseWriter, r *http.Request) {
+func (s *Service) Update(w http.ResponseWriter, r *http.Request) error {
 
 	if !s.IsValidToken(w, r) {
-		return
+		return errors.New("invalid token.")
 	}
 
-	request := dto.UpdatePasswordRequest{}
+	request := dto.UpdatePasswordRequestDTO{}
 	credBackup := schema.Credentials{}
 
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -25,7 +26,7 @@ func (s *Service) Update(w http.ResponseWriter, r *http.Request) {
 		s.ErrorLogger.Write(slog.LevelError, err.Error())
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
-		return
+		return err
 	}
 
 	credentialPassword, err := s.Repo.ReadOne(request.Email)
@@ -33,7 +34,7 @@ func (s *Service) Update(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
 		s.ErrorLogger.Write(slog.LevelError, err.Error())
-		return
+		return err
 	}
 
 	err = encrypt.VerifyPassword(request.OldPassword, credentialPassword)
@@ -41,7 +42,7 @@ func (s *Service) Update(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
 		s.ErrorLogger.Write(slog.LevelError, err.Error())
-		return
+		return err
 	}
 
 	credBackup.Email = request.Email
@@ -52,7 +53,7 @@ func (s *Service) Update(w http.ResponseWriter, r *http.Request) {
 		s.ErrorLogger.Write(slog.LevelError, err.Error())
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error() + "rows affcteds: " + strconv.FormatInt(rows, 10))
-		return
+		return err
 	}
 
 	err = s.Repo.Create(schema.Credentials{Email: request.Email, Password: request.NewPassword})
@@ -62,17 +63,18 @@ func (s *Service) Update(w http.ResponseWriter, r *http.Request) {
 			s.ErrorLogger.Write(slog.LevelError, backErr.Error())
 			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode(err.Error())
-			return
+			return err
 		}
 
 		s.ErrorLogger.Write(slog.LevelError, err.Error())
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
-		return
+		return err
 	}
 
 	s.AccessLogger.Write(slog.LevelInfo, "Successful password update, email: "+request.Email)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("Password update successfully")
+	return nil
 
 }

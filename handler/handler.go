@@ -8,12 +8,12 @@ import (
 )
 
 type CredentialsService interface {
-	Create(w http.ResponseWriter, r *http.Request)
-	Delete(w http.ResponseWriter, r *http.Request)
-	Update(w http.ResponseWriter, r *http.Request)
+	Create(w http.ResponseWriter, r *http.Request) error
+	Delete(w http.ResponseWriter, r *http.Request) error
+	Update(w http.ResponseWriter, r *http.Request) error
 	IsValidToken(w http.ResponseWriter, r *http.Request) bool
-	Login(w http.ResponseWriter, r *http.Request)
-	Read(w http.ResponseWriter, r *http.Request)
+	Login(w http.ResponseWriter, r *http.Request) error
+	Read(w http.ResponseWriter, r *http.Request) error
 }
 
 type Service struct {
