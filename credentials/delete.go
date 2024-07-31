@@ -8,13 +8,13 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func (c *credentialHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (c *CredentialHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	email := r.PathValue("email")
 	if !c.IsValidToken(w, r) {
 		return
 	}
 
-	cred, err := s.Repo.ReadOne(email)
+	cred, err := c.Repo.ReadOne(email)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())

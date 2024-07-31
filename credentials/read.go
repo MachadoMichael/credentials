@@ -9,7 +9,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func (c *credentialHandler) Read(w http.ResponseWriter, r *http.Request) {
+func (c *CredentialHandler) Read(w http.ResponseWriter, r *http.Request) {
 	if !c.IsValidToken(w, r) {
 		return
 	}

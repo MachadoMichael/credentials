@@ -9,7 +9,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func (c *credentialHandler) IsValidToken(w http.ResponseWriter, r *http.Request) bool {
+func (c *CredentialHandler) IsValidToken(w http.ResponseWriter, r *http.Request) bool {
 	token := r.Header.Get("Authorization")
 	if token == "" {
 		w.WriteHeader(http.StatusUnauthorized)
