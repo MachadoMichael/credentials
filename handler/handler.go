@@ -16,14 +16,14 @@ type service interface {
 	Read(w http.ResponseWriter, r *http.Request)
 }
 
-type credentialHandler struct {
+type CredentialHandler struct {
 	Repo         *schema.Repo
 	AccessLogger *logger.Logger
 	ErrorLogger  *logger.Logger
 }
 
 func NewCredentialHandler(repo *schema.Repo, al *logger.Logger, el *logger.Logger) service {
-	return &credentialHandler{
+	return &CredentialHandler{
 		Repo:         repo,
 		AccessLogger: al,
 		ErrorLogger:  el,
