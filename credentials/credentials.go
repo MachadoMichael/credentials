@@ -1,4 +1,4 @@
-package credentials
+package handler
 
 import (
 	"net/http"
@@ -22,9 +22,9 @@ type CredentialHandler struct {
 	ErrorLogger  *logger.Logger
 }
 
-func NewCredentialHandler(repo schema.RepoInterface, al *logger.Logger, el *logger.Logger) Service {
+func New(r schema.RepoInterface, al *logger.Logger, el *logger.Logger) Service {
 	return &CredentialHandler{
-		Repo:         repo,
+		Repo:         r,
 		AccessLogger: al,
 		ErrorLogger:  el,
 	}
