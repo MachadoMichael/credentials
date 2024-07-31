@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/MachadoMichael/credentials/model"
 	"github.com/MachadoMichael/credentials/pkg/encrypt"
-	"github.com/MachadoMichael/credentials/schema"
 	"golang.org/x/exp/slog"
 )
 
 func (c *credentialHandler) Login(w http.ResponseWriter, r *http.Request) {
-	credential := schema.Credentials{}
+	credential := model.Credential{}
 	err := json.NewDecoder(r.Body).Decode(&credential)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)

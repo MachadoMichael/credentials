@@ -1,6 +1,6 @@
-package schema
+package model
 
-type Credentials struct {
+type Credential struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }

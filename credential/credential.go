@@ -3,8 +3,8 @@ package credential
 import (
 	"net/http"
 
+	"github.com/MachadoMichael/credentials/model"
 	"github.com/MachadoMichael/credentials/pkg/logger"
-	"github.com/MachadoMichael/credentials/schema"
 )
 
 type credentialService interface {
@@ -17,12 +17,12 @@ type credentialService interface {
 }
 
 type credentialHandler struct {
-	Repo         schema.RepoService
+	Repo         model.RepoService
 	AccessLogger *logger.Logger
 	ErrorLogger  *logger.Logger
 }
 
-func NewHandler(r schema.RepoService, al *logger.Logger, el *logger.Logger) credentialService {
+func NewHandler(r model.RepoService, al *logger.Logger, el *logger.Logger) credentialService {
 	return &credentialHandler{
 		Repo:         r,
 		AccessLogger: al,

@@ -6,8 +6,8 @@ import (
 	"strconv"
 
 	"github.com/MachadoMichael/credentials/dto"
+	"github.com/MachadoMichael/credentials/model"
 	"github.com/MachadoMichael/credentials/pkg/encrypt"
-	"github.com/MachadoMichael/credentials/schema"
 	"golang.org/x/exp/slog"
 )
 
@@ -17,7 +17,7 @@ func (c *credentialHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	request := dto.UpdatePasswordRequestDTO{}
-	credBackup := schema.Credentials{}
+	credBackup := model.Credential{}
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -54,7 +54,7 @@ func (c *credentialHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = c.Repo.Create(schema.Credentials{Email: request.Email, Password: request.NewPassword})
+	err = c.Repo.Create(model.Credential{Email: request.Email, Password: request.NewPassword})
 	if err != nil {
 		err = c.Repo.Create(credBackup)
 		if err != nil {

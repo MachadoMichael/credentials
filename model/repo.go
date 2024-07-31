@@ -1,4 +1,4 @@
-package schema
+package model
 
 type RepoService interface {
 	Read() (map[string]string, error)
