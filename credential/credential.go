@@ -7,7 +7,7 @@ import (
 	"github.com/MachadoMichael/credentials/schema"
 )
 
-type Service interface {
+type credentialService interface {
 	Create(w http.ResponseWriter, r *http.Request)
 	Delete(w http.ResponseWriter, r *http.Request)
 	Update(w http.ResponseWriter, r *http.Request)
@@ -16,14 +16,14 @@ type Service interface {
 	Read(w http.ResponseWriter, r *http.Request)
 }
 
-type CredentialHandler struct {
-	Repo         schema.RepoInterface
+type credentialHandler struct {
+	Repo         schema.RepoService
 	AccessLogger *logger.Logger
 	ErrorLogger  *logger.Logger
 }
 
-func NewHandler(r schema.RepoInterface, al *logger.Logger, el *logger.Logger) Service {
-	return &CredentialHandler{
+func NewHandler(r schema.RepoService, al *logger.Logger, el *logger.Logger) credentialService {
+	return &credentialHandler{
 		Repo:         r,
 		AccessLogger: al,
 		ErrorLogger:  el,

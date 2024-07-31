@@ -8,7 +8,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func (c *CredentialHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (c *credentialHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	email := r.PathValue("email")
 	if !c.IsValidToken(w, r) {
 		return

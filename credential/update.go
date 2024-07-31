@@ -11,7 +11,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func (c *CredentialHandler) Update(w http.ResponseWriter, r *http.Request) {
+func (c *credentialHandler) Update(w http.ResponseWriter, r *http.Request) {
 	if !c.IsValidToken(w, r) {
 		return
 	}
