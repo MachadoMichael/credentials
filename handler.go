@@ -1,4 +1,4 @@
-package handler
+package credentials
 
 import (
 	"net/http"
