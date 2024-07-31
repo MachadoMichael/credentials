@@ -3,7 +3,7 @@ package credentials
 import (
 	"net/http"
 
-	"github.com/MachadoMichael/credentials/internal/logger"
+	"github.com/MachadoMichael/credentials/pkg/logger"
 	"github.com/MachadoMichael/credentials/schema"
 )
 

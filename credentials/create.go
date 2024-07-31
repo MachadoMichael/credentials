@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"unicode/utf8"
 
-	"github.com/MachadoMichael/credentials/internal/encrypt"
+	"github.com/MachadoMichael/credentials/pkg/encrypt"
 	"github.com/MachadoMichael/credentials/schema"
 	"golang.org/x/exp/slog"
 )
