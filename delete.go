@@ -1,18 +1,17 @@
-package handler
+package credentials
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 
 	"golang.org/x/exp/slog"
 )
 
-func (s *Service) Delete(w http.ResponseWriter, r *http.Request) error {
+func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 	email := r.PathValue("email")
 	if !s.IsValidToken(w, r) {
-		return errors.New("invalid token.")
+		return
 	}
 
 	cred, err := s.Repo.ReadOne(email)
@@ -20,14 +19,14 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) error {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
 		s.ErrorLogger.Write(slog.LevelError, err.Error())
-		return err
+		return
 	}
 
 	if cred == "" {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("There isn't register for this email.")
 		s.ErrorLogger.Write(slog.LevelError, "There isn't register for this email.")
-		return err
+		return
 	}
 
 	rows, err := s.Repo.Delete(email)
@@ -35,12 +34,11 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) error {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
 		s.ErrorLogger.Write(slog.LevelError, err.Error())
-		return err
+		return
 	}
 
 	s.AccessLogger.Write(slog.LevelInfo, "Credential deleted successfully, email: "+email+"rows: "+strconv.FormatInt(rows, 10))
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("Credential deleted successfully, email: " + email)
 
-	return nil
 }

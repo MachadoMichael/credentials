@@ -1,4 +1,4 @@
-package handler
+package credentials
 
 import (
 	"encoding/json"
@@ -10,13 +10,13 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func (s *Service) Create(w http.ResponseWriter, r *http.Request) error {
+func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 	credential := schema.Credentials{}
 	err := json.NewDecoder(r.Body).Decode(&credential)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
-		return err
+		return
 	}
 
 	cred, err := s.Repo.ReadOne(credential.Email)
@@ -24,21 +24,21 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) error {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
 		s.ErrorLogger.Write(slog.LevelError, err.Error())
-		return err
+		return
 	}
 
 	if cred != "" {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("This email is already in use")
 		s.ErrorLogger.Write(slog.LevelError, "This email is already iin use")
-		return err
+		return
 	}
 
 	if utf8.RuneCountInString(credential.Password) < 6 {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("The password must be longer than 6 characters.")
 		s.ErrorLogger.Write(slog.LevelError, "The password must be longer than 6 characters.")
-		return err
+		return
 	}
 
 	hash, hashErr := encrypt.HashPassword(credential.Password)
@@ -46,7 +46,7 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) error {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err)
 		s.ErrorLogger.Write(slog.LevelError, hashErr.Error())
-		return err
+		return
 	}
 
 	credential.Password = hash
@@ -55,13 +55,11 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) error {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err)
 		s.ErrorLogger.Write(slog.LevelError, errDb.Error())
-		return err
+		return
 	}
 
 	s.AccessLogger.Write(slog.LevelInfo, "New Credential created successfully, email: "+credential.Email)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("Credential created successfully")
-
-	return nil
 
 }

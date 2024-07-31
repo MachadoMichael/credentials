@@ -1,4 +1,4 @@
-package handler
+package credentials
 
 import (
 	"encoding/json"
@@ -9,14 +9,14 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func (s *Service) Login(w http.ResponseWriter, r *http.Request) error {
+func (s *Service) Login(w http.ResponseWriter, r *http.Request) {
 	credential := schema.Credentials{}
 	err := json.NewDecoder(r.Body).Decode(&credential)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
 		s.ErrorLogger.Write(slog.LevelError, err.Error())
-		return err
+		return
 	}
 
 	credentialPassword, err := s.Repo.ReadOne(credential.Email)
@@ -24,14 +24,14 @@ func (s *Service) Login(w http.ResponseWriter, r *http.Request) error {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
 		s.ErrorLogger.Write(slog.LevelError, "Credential not found")
-		return err
+		return
 	}
 
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
 		s.ErrorLogger.Write(slog.LevelError, err.Error())
-		return err
+		return
 	}
 
 	err = encrypt.VerifyPassword(credentialPassword, credential.Password)
@@ -39,7 +39,7 @@ func (s *Service) Login(w http.ResponseWriter, r *http.Request) error {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
 		s.ErrorLogger.Write(slog.LevelError, err.Error())
-		return err
+		return
 	}
 
 	token, err := encrypt.GenerateToken(credential.Email)
@@ -47,12 +47,11 @@ func (s *Service) Login(w http.ResponseWriter, r *http.Request) error {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
 		s.ErrorLogger.Write(slog.LevelError, err.Error())
-		return err
+		return
 	}
 
 	s.AccessLogger.Write(slog.LevelInfo, "sucessful login attempt, email: "+credential.Email)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(token)
 
-	return nil
 }

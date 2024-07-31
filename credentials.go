@@ -1,39 +1,31 @@
 package credentials
 
 import (
-	"github.com/MachadoMichael/credentials/handler"
-	"github.com/MachadoMichael/credentials/infra"
-	"github.com/MachadoMichael/credentials/infra/database"
+	"net/http"
+
 	"github.com/MachadoMichael/credentials/pkg/logger"
+	"github.com/MachadoMichael/credentials/schema"
 )
 
-type Credentials interface {
-	Init() *handler.Service
+type CredentialsHandler interface {
+	Create(w http.ResponseWriter, r *http.Request)
+	Delete(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request)
+	IsValidToken(w http.ResponseWriter, r *http.Request) bool
+	Login(w http.ResponseWriter, r *http.Request)
+	Read(w http.ResponseWriter, r *http.Request)
 }
 
-type Cred struct {
+type Service struct {
+	Repo         *schema.Repo
+	AccessLogger *logger.Logger
+	ErrorLogger  *logger.Logger
 }
 
-func NewCredentialHandler() Credentials {
-	return &Cred{}
-}
-
-func (c *Cred) Init() *handler.Service {
-	infra.Init()
-	al, el, err := logger.Init()
-	if err != nil {
-		panic(err)
-	}
-
-	defer al.Close()
-	defer el.Close()
-
-	database.Init()
-	defer database.CloseDb()
-
-	return &handler.Service{
-		Repo:         database.CredentialRepo,
-		AccessLogger: *logger.Logger,
-		ErrorLogger:  *logger.Logger,
+func NewService(repo *schema.Repo, al *logger.Logger, el *logger.Logger) CredentialsHandler {
+	return &Service{
+		Repo:         repo,
+		AccessLogger: al,
+		ErrorLogger:  el,
 	}
 }
