@@ -7,7 +7,7 @@ import (
 	"github.com/MachadoMichael/credentials/schema"
 )
 
-type service interface {
+type Service interface {
 	Create(w http.ResponseWriter, r *http.Request)
 	Delete(w http.ResponseWriter, r *http.Request)
 	Update(w http.ResponseWriter, r *http.Request)
@@ -22,7 +22,7 @@ type CredentialHandler struct {
 	ErrorLogger  *logger.Logger
 }
 
-func NewCredentialHandler(repo *schema.Repo, al *logger.Logger, el *logger.Logger) service {
+func NewCredentialHandler(repo *schema.Repo, al *logger.Logger, el *logger.Logger) Service {
 	return &CredentialHandler{
 		Repo:         repo,
 		AccessLogger: al,
