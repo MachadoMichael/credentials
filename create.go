@@ -10,7 +10,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func (c *credentialHandler) Create(w http.ResponseWriter, r *http.Request) {
+func (c *CredentialHandler) Create(w http.ResponseWriter, r *http.Request) {
 	credential := schema.Credentials{}
 	err := json.NewDecoder(r.Body).Decode(&credential)
 	if err != nil {
