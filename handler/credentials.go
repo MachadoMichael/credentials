@@ -22,7 +22,7 @@ type CredentialHandler struct {
 	ErrorLogger  *logger.Logger
 }
 
-func New(r schema.RepoInterface, al *logger.Logger, el *logger.Logger) Service {
+func NewCredentialHandler(r schema.RepoInterface, al *logger.Logger, el *logger.Logger) Service {
 	return &CredentialHandler{
 		Repo:         r,
 		AccessLogger: al,
