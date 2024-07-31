@@ -1,4 +1,4 @@
-package credentials
+package handler
 
 import (
 	"encoding/json"
