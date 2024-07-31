@@ -6,16 +6,16 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-type Repo struct {
-	ctx context.Context
-	db  *redis.Client
-}
-
 type RepoInterface interface {
 	Read() (map[string]string, error)
 	ReadOne(email string) (string, error)
 	Delete(email string) (int64, error)
 	Create(cred Credentials) error
+}
+
+type Repo struct {
+	ctx context.Context
+	db  *redis.Client
 }
 
 func (r *Repo) Read() (map[string]string, error) {
