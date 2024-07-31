@@ -12,14 +12,14 @@ type Repo struct {
 }
 
 type RepoInterface interface {
-	Read() ([]Credentials, error)
+	Read() (map[string]string, error)
 	ReadOne(email string) (string, error)
-	Delete(email string) (int, error)
+	Delete(email string) (int64, error)
 	Create(cred Credentials) error
 }
 
-func (r *Repo) Read() ([]Credentials, error) {
-	creds := []Credentials{}
+func (r *Repo) Read() (map[string]string, error) {
+	creds := make(map[string]string)
 	return creds, nil
 }
 
@@ -27,7 +27,7 @@ func (r *Repo) ReadOne(email string) (string, error) {
 	return "", nil
 }
 
-func (r *Repo) Delete(email string) (int, error) {
+func (r *Repo) Delete(email string) (int64, error) {
 	return 0, nil
 }
 

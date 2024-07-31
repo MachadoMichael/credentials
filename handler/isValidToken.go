@@ -9,12 +9,12 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func (s *Service) IsValidToken(w http.ResponseWriter, r *http.Request) bool {
+func (c *credentialHandler) IsValidToken(w http.ResponseWriter, r *http.Request) bool {
 	token := r.Header.Get("Authorization")
 	if token == "" {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("no token provided")
-		s.ErrorLogger.Write(slog.LevelError, "no token provided")
+		c.ErrorLogger.Write(slog.LevelError, "no token provided")
 		return false
 	}
 
@@ -23,11 +23,11 @@ func (s *Service) IsValidToken(w http.ResponseWriter, r *http.Request) bool {
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("no token provided")
-		s.ErrorLogger.Write(slog.LevelError, err.Error())
+		c.ErrorLogger.Write(slog.LevelError, err.Error())
 		return false
 	}
 
-	s.AccessLogger.Write(slog.LevelInfo, "Token validate successfully, token "+token)
+	c.AccessLogger.Write(slog.LevelInfo, "Token validate successfully, token "+token)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("token authorized successfully")
 	return res

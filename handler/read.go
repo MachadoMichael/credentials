@@ -9,14 +9,14 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func (s *Service) Read(w http.ResponseWriter, r *http.Request) {
-	if !s.IsValidToken(w, r) {
+func (c *credentialHandler) Read(w http.ResponseWriter, r *http.Request) {
+	if !c.IsValidToken(w, r) {
 		return
 	}
 
-	credentials, err := s.Repo.Read()
+	credentials, err := c.Repo.Read()
 	if err != nil {
-		s.ErrorLogger.Write(slog.LevelError, err.Error())
+		c.ErrorLogger.Write(slog.LevelError, err.Error())
 		return
 	}
 
@@ -35,7 +35,7 @@ func (s *Service) Read(w http.ResponseWriter, r *http.Request) {
 		ReadAt:  formattedTime,
 	}
 
-	s.AccessLogger.Write(slog.LevelInfo, "Successful to read credentials on database.")
+	c.AccessLogger.Write(slog.LevelInfo, "Successful to read credentials on database.")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
 }
